@@ -240,11 +240,11 @@ class Peer(nodeParams: NodeParams, remoteNodeId: PublicKey, authenticator: Actor
           c + 1
       }
 
-      log.info(s"sending all announcements to {}", remoteNodeId)
+      log.debug(s"sending all announcements to {}", remoteNodeId)
       val channelsSent = send(channels)
       val nodesSent = send(nodes)
       val updatesSent = send(updates)
-      log.info(s"sent all announcements to {}: channels={} updates={} nodes={}", remoteNodeId, channelsSent, updatesSent, nodesSent)
+      log.debug(s"sent all announcements to {}: channels={} updates={} nodes={}", remoteNodeId, channelsSent, updatesSent, nodesSent)
       stay
 
     case Event(rebroadcast: Rebroadcast, ConnectedData(_, transport, _, _, maybeGossipTimestampFilter, _)) =>
