@@ -16,7 +16,7 @@
 
 package fr.acinq.eclair
 
-import com.codahale.metrics.Slf4jReporter
+import com.codahale.metrics.{MetricFilter, Slf4jReporter}
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 import java.io.File
@@ -84,13 +84,24 @@ class Setup(datadir: File,
   // this will force the secure random instance to initialize itself right now, making sure it doesn't hang later (see comment in package.scala)
   secureRandom.nextInt()
 
-  val reporter = Slf4jReporter
+  Slf4jReporter
     .forRegistry(nodeParams.metrics)
     .outputTo(LoggerFactory.getLogger("fr.acinq.eclair.metrics"))
     .convertRatesTo(TimeUnit.SECONDS)
     .convertDurationsTo(TimeUnit.MILLISECONDS)
+    .filter(MetricFilter.startsWith("router"))
     .build
-  reporter.start(1, TimeUnit.MINUTES)
+    .start(1, TimeUnit.MINUTES)
+
+  Slf4jReporter
+    .forRegistry(nodeParams.metrics)
+    .outputTo(LoggerFactory.getLogger("fr.acinq.eclair.metrics"))
+    .convertRatesTo(TimeUnit.SECONDS)
+    .convertDurationsTo(TimeUnit.MILLISECONDS)
+    .filter(MetricFilter.startsWith("peer"))
+    .build
+    .start(1, TimeUnit.HOURS)
+
 
   implicit val materializer = ActorMaterializer()
   implicit val timeout = Timeout(30 seconds)
